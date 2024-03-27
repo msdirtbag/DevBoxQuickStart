@@ -1,0 +1,897 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "env": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "stoptime": {
+      "type": "string"
+    },
+    "stoptimezone": {
+      "type": "string"
+    },
+    "vnetspace": {
+      "type": "string"
+    },
+    "mainsnetspace": {
+      "type": "string"
+    },
+    "dbusergroupid": {
+      "type": "string"
+    },
+    "dblocaladmin": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "environmentid": "[uniqueString(subscription().id, tenant().tenantId, parameters('env'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[parameters('env')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "14178020914344325750"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Resources/resourceGroups",
+              "apiVersion": "2022-09-01",
+              "name": "[format('rg-dbqs-{0}', parameters('env'))]",
+              "location": "[parameters('location')]"
+            }
+          ],
+          "outputs": {
+            "resourcegroupname": {
+              "type": "string",
+              "value": "[format('rg-dbqs-{0}', parameters('env'))]"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('umi-dbqs-{0}', parameters('env'))]",
+      "resourceGroup": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "env": {
+            "value": "[variables('environmentid')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "16092030801516747259"
+            }
+          },
+          "parameters": {
+            "env": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+              "apiVersion": "2023-01-31",
+              "name": "[format('umi-dbqs-{0}', parameters('env'))]",
+              "location": "[parameters('location')]"
+            }
+          ],
+          "outputs": {
+            "umipid": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('umi-dbqs-{0}', parameters('env'))), '2023-01-31').principalId]"
+            },
+            "umicid": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('umi-dbqs-{0}', parameters('env'))), '2023-01-31').clientId]"
+            },
+            "umirid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', format('umi-dbqs-{0}', parameters('env')))]"
+            },
+            "uminame": {
+              "type": "string",
+              "value": "[format('umi-dbqs-{0}', parameters('env'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('rg-dbqs-{0}', parameters('env')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('vnet-dbqs-{0}', parameters('env'))]",
+      "resourceGroup": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "environmentid": {
+            "value": "[variables('environmentid')]"
+          },
+          "larid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.laworkspacerid.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vnetspace": {
+            "value": "[parameters('vnetspace')]"
+          },
+          "mainsnetspace": {
+            "value": "[parameters('mainsnetspace')]"
+          },
+          "mainnsg": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('nsg-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.mainnsgid.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "11507438314223207336"
+            }
+          },
+          "parameters": {
+            "environmentid": {
+              "type": "string"
+            },
+            "larid": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "vnetspace": {
+              "type": "string"
+            },
+            "mainsnetspace": {
+              "type": "string"
+            },
+            "mainnsg": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/publicIPAddresses",
+              "apiVersion": "2023-09-01",
+              "name": "[format('pip-nat-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard",
+                "tier": "Regional"
+              },
+              "properties": {
+                "publicIPAddressVersion": "IPv4",
+                "publicIPAllocationMethod": "Static",
+                "idleTimeoutInMinutes": 4
+              }
+            },
+            {
+              "type": "Microsoft.Network/natGateways",
+              "apiVersion": "2023-09-01",
+              "name": "[format('nat-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Standard"
+              },
+              "properties": {
+                "idleTimeoutInMinutes": 4,
+                "publicIpAddresses": [
+                  {
+                    "id": "[resourceId('Microsoft.Network/publicIPAddresses', format('pip-nat-dbqs-{0}', parameters('environmentid')))]"
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', format('pip-nat-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Network/virtualNetworks",
+              "apiVersion": "2023-09-01",
+              "name": "[format('vnet-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "addressSpace": {
+                  "addressPrefixes": [
+                    "[parameters('vnetspace')]"
+                  ]
+                },
+                "subnets": [
+                  {
+                    "name": "main",
+                    "properties": {
+                      "addressPrefix": "[parameters('mainsnetspace')]",
+                      "natGateway": {
+                        "id": "[resourceId('Microsoft.Network/natGateways', format('nat-dbqs-{0}', parameters('environmentid')))]"
+                      },
+                      "privateEndpointNetworkPolicies": "Disabled",
+                      "privateLinkServiceNetworkPolicies": "Disabled",
+                      "defaultOutboundAccess": false,
+                      "networkSecurityGroup": {
+                        "id": "[parameters('mainnsg')]"
+                      },
+                      "serviceEndpoints": [
+                        {
+                          "service": "Microsoft.AzureActiveDirectory",
+                          "locations": [
+                            "[parameters('location')]"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/natGateways', format('nat-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Network/virtualNetworks/{0}', format('vnet-dbqs-{0}', parameters('environmentid')))]",
+              "name": "Monitor",
+              "properties": {
+                "metrics": [
+                  {
+                    "category": "allMetrics",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('larid')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "virtualnetworkid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks', format('vnet-dbqs-{0}', parameters('environmentid')))]"
+            },
+            "virtualnetworkname": {
+              "type": "string",
+              "value": "[format('vnet-dbqs-{0}', parameters('environmentid'))]"
+            },
+            "mainsubnetresourceid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/virtualNetworks/subnets', format('vnet-dbqs-{0}', parameters('environmentid')), 'main')]"
+            },
+            "mainsubnetid": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', format('vnet-dbqs-{0}', parameters('environmentid'))), '2023-09-01').subnets[0].id]"
+            },
+            "mainsubnetname": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', format('vnet-dbqs-{0}', parameters('environmentid'))), '2023-09-01').subnets[0].name]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('nsg-dbqs-{0}', parameters('env')))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('rg-dbqs-{0}', parameters('env')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('nsg-dbqs-{0}', parameters('env'))]",
+      "resourceGroup": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "environmentid": {
+            "value": "[variables('environmentid')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "workspaceid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.laworkspacerid.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "336699977449890071"
+            }
+          },
+          "parameters": {
+            "environmentid": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "workspaceid": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkSecurityGroups",
+              "apiVersion": "2023-04-01",
+              "name": "[format('nsg-dbqc-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "securityRules": [
+                  {
+                    "name": "Deny_All_Internet_Inbound",
+                    "properties": {
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "Internet",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Deny",
+                      "priority": 999,
+                      "direction": "Inbound"
+                    }
+                  },
+                  {
+                    "name": "Allow_VNET_Outbound",
+                    "properties": {
+                      "protocol": "*",
+                      "sourcePortRange": "*",
+                      "destinationPortRange": "*",
+                      "sourceAddressPrefix": "VirtualNetwork",
+                      "destinationAddressPrefix": "VirtualNetwork",
+                      "access": "Allow",
+                      "priority": 990,
+                      "direction": "Outbound"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Network/networkSecurityGroups/{0}', format('nsg-dbqc-{0}', parameters('environmentid')))]",
+              "name": "Monitor",
+              "properties": {
+                "logs": [
+                  {
+                    "categoryGroup": "allLogs",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('workspaceid')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkSecurityGroups', format('nsg-dbqc-{0}', parameters('environmentid')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "mainnsgid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Network/networkSecurityGroups', format('nsg-dbqc-{0}', parameters('environmentid')))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env')))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('rg-dbqs-{0}', parameters('env')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('db-dbqs-{0}', parameters('env'))]",
+      "resourceGroup": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "dbusergroupid": {
+            "value": "[parameters('dbusergroupid')]"
+          },
+          "laworkspaceid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.laworkspacerid.value]"
+          },
+          "umirid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('umi-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.umirid.value]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "environmentid": {
+            "value": "[variables('environmentid')]"
+          },
+          "stoptime": {
+            "value": "[parameters('stoptime')]"
+          },
+          "stoptimezone": {
+            "value": "[parameters('stoptimezone')]"
+          },
+          "dblocaladmin": {
+            "value": "[parameters('dblocaladmin')]"
+          },
+          "mainsubnetid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('vnet-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.mainsubnetresourceid.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "18210331908896163337"
+            }
+          },
+          "parameters": {
+            "environmentid": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "mainsubnetid": {
+              "type": "string"
+            },
+            "laworkspaceid": {
+              "type": "string"
+            },
+            "dbusergroupid": {
+              "type": "string"
+            },
+            "umirid": {
+              "type": "string"
+            },
+            "stoptime": {
+              "type": "string"
+            },
+            "stoptimezone": {
+              "type": "string"
+            },
+            "dblocaladmin": {
+              "type": "string"
+            }
+          },
+          "variables": {
+            "$fxv#0": {
+              "definitions": [
+                {
+                  "name": "win11-vs2022-vscode",
+                  "image": "win11-ent-vs2022",
+                  "compute": "8c-32gb",
+                  "storage": "256gb"
+                },
+                {
+                  "name": "win10-vs2022-vscode",
+                  "image": "win10-ent-vs2022",
+                  "compute": "8c-32gb",
+                  "storage": "256gb"
+                }
+              ],
+              "pools": [
+                {
+                  "name": "win11-vs2022-vscode-pool",
+                  "definition": "win11-vs2022-vscode",
+                  "administrator": "Enabled"
+                },
+                {
+                  "name": "win10-vs2022-vscode-pool",
+                  "definition": "win10-vs2022-vscode",
+                  "administrator": "Enabled"
+                }
+              ]
+            },
+            "devcentersettings": "[variables('$fxv#0')]",
+            "image": {
+              "win10-ent-vs2022": "microsoftvisualstudio_visualstudioplustools_vs-2022-ent-general-win10-m365-gen2",
+              "win11-ent-vs2022": "microsoftvisualstudio_visualstudioplustools_vs-2022-ent-general-win11-m365-gen2"
+            },
+            "compute": {
+              "8c-32gb": "general_i_8c32gb256ssd_v2",
+              "16c-64gb": "general_i_16c64gb512ssd_v2",
+              "32c-128gb": "general_i_32c128gb1024ssd_v2"
+            },
+            "dbuserrole": "/providers/Microsoft.Authorization/roleDefinitions/45d50f46-0b78-4001-a660-4198cbe8cd05"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DevCenter/devcenters",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('dc-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('umirid'))]": {}
+                }
+              },
+              "properties": {}
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.DevCenter/devcenters/{0}', format('dc-dbqs-{0}', parameters('environmentid')))]",
+              "name": "Monitor",
+              "properties": {
+                "logs": [
+                  {
+                    "categoryGroup": "allLogs",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "allMetrics",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[parameters('laworkspaceid')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.DevCenter/projects/{0}', format('dbp-dbqs-{0}', parameters('environmentid')))]",
+              "name": "[guid(variables('dbuserrole'), parameters('dbusergroupid'), parameters('environmentid'), subscription().id)]",
+              "properties": {
+                "roleDefinitionId": "[variables('dbuserrole')]",
+                "principalId": "[parameters('dbusergroupid')]",
+                "principalType": "Group"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/projects', format('dbp-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/projects",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('dbp-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "devCenterId": "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]",
+                "maxDevBoxesPerUser": 1
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/devcenters/catalogs",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dc-dbqs-{0}', parameters('environmentid')), 'quickstart-devbox-tasks')]",
+              "properties": {
+                "gitHub": {
+                  "uri": "https://github.com/microsoft/devcenter-catalog.git",
+                  "branch": "main",
+                  "path": "Tasks"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/devcenters/catalogs",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dc-dbqs-{0}', parameters('environmentid')), 'quickstart-environment-definitions')]",
+              "properties": {
+                "gitHub": {
+                  "uri": "https://github.com/microsoft/devcenter-catalog.git",
+                  "branch": "main",
+                  "path": "Environment-Definitions"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/networkConnections",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('nc-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "domainJoinType": "AzureADJoin",
+                "subnetId": "[parameters('mainsubnetid')]"
+              }
+            },
+            {
+              "type": "Microsoft.DevCenter/projects/pools",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool01-dbqs-{0}', parameters('environmentid')))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "devBoxDefinitionName": "win10-vs2022-vscode",
+                "networkConnectionName": "[format('dbattachednetworks-dbqs-{0}', parameters('environmentid'))]",
+                "licenseType": "Windows_Client",
+                "localAdministrator": "[parameters('dblocaladmin')]",
+                "singleSignOnStatus": "Enabled",
+                "virtualNetworkType": "Unmanaged"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters/attachednetworks', format('dc-dbqs-{0}', parameters('environmentid')), format('dbattachednetworks-dbqs-{0}', parameters('environmentid')))]",
+                "[resourceId('Microsoft.DevCenter/projects', format('dbp-dbqs-{0}', parameters('environmentid')))]",
+                "devboxdefinitions"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/projects/pools",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool02-dbqs-{0}', parameters('environmentid')))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "devBoxDefinitionName": "win11-vs2022-vscode",
+                "networkConnectionName": "[format('dbattachednetworks-dbqs-{0}', parameters('environmentid'))]",
+                "licenseType": "Windows_Client",
+                "localAdministrator": "[parameters('dblocaladmin')]",
+                "singleSignOnStatus": "Enabled",
+                "virtualNetworkType": "Unmanaged"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters/attachednetworks', format('dc-dbqs-{0}', parameters('environmentid')), format('dbattachednetworks-dbqs-{0}', parameters('environmentid')))]",
+                "[resourceId('Microsoft.DevCenter/projects', format('dbp-dbqs-{0}', parameters('environmentid')))]",
+                "devboxdefinitions"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/devcenters/attachednetworks",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dc-dbqs-{0}', parameters('environmentid')), format('dbattachednetworks-dbqs-{0}', parameters('environmentid')))]",
+              "properties": {
+                "networkConnectionId": "[resourceId('Microsoft.DevCenter/networkConnections', format('nc-dbqs-{0}', parameters('environmentid')))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]",
+                "[resourceId('Microsoft.DevCenter/networkConnections', format('nc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "devboxdefinitions",
+                "count": "[length(variables('devcentersettings').definitions)]"
+              },
+              "type": "Microsoft.DevCenter/devcenters/devboxdefinitions",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}', format('dc-dbqs-{0}', parameters('environmentid')), variables('devcentersettings').definitions[copyIndex()].name)]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "imageReference": {
+                  "id": "[format('{0}/galleries/default/images/{1}', resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid'))), variables('image')[variables('devcentersettings').definitions[copyIndex()].image])]"
+                },
+                "sku": {
+                  "name": "[variables('compute')[variables('devcentersettings').definitions[copyIndex()].compute]]"
+                },
+                "osStorageType": "[format('ssd_{0}', variables('devcentersettings').definitions[copyIndex()].storage)]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/devcenters/attachednetworks', format('dc-dbqs-{0}', parameters('environmentid')), format('dbattachednetworks-dbqs-{0}', parameters('environmentid')))]",
+                "[resourceId('Microsoft.DevCenter/devcenters', format('dc-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/projects/pools/schedules",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}/{2}', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool01-dbqs-{0}', parameters('environmentid')), 'default')]",
+              "properties": {
+                "type": "StopDevBox",
+                "frequency": "Daily",
+                "time": "[parameters('stoptime')]",
+                "timeZone": "[parameters('stoptimezone')]",
+                "state": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/projects/pools', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool01-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DevCenter/projects/pools/schedules",
+              "apiVersion": "2023-10-01-preview",
+              "name": "[format('{0}/{1}/{2}', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool02-dbqs-{0}', parameters('environmentid')), 'default')]",
+              "properties": {
+                "type": "StopDevBox",
+                "frequency": "Daily",
+                "time": "[parameters('stoptime')]",
+                "timeZone": "[parameters('stoptimezone')]",
+                "state": "Enabled"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DevCenter/projects/pools', format('dbp-dbqs-{0}', parameters('environmentid')), format('dbpool02-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('log-dbqs-{0}', parameters('env')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('umi-dbqs-{0}', parameters('env')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('vnet-dbqs-{0}', parameters('env')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('log-dbqs-{0}', parameters('env'))]",
+      "resourceGroup": "[format('rg-dbqs-{0}', parameters('env'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "environmentid": {
+            "value": "[variables('environmentid')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "umirid": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('umi-dbqs-{0}', parameters('env'))), '2022-09-01').outputs.umirid.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.26.54.24096",
+              "templateHash": "18192713086730588997"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "environmentid": {
+              "type": "string"
+            },
+            "umirid": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2022-10-01",
+              "name": "[format('log-dbqs-{0}', parameters('environmentid'))]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[format('{0}', parameters('umirid'))]": {}
+                }
+              },
+              "properties": {
+                "features": {
+                  "enableDataExport": true
+                },
+                "publicNetworkAccessForIngestion": "Enabled",
+                "publicNetworkAccessForQuery": "Enabled",
+                "retentionInDays": 90,
+                "sku": {
+                  "name": "PerGB2018"
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.OperationalInsights/workspaces/{0}', format('log-dbqs-{0}', parameters('environmentid')))]",
+              "name": "Monitor-LA",
+              "properties": {
+                "logs": [
+                  {
+                    "categoryGroup": "allLogs",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "allMetrics",
+                    "enabled": true
+                  }
+                ],
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', format('log-dbqs-{0}', parameters('environmentid')))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.OperationalInsights/workspaces', format('log-dbqs-{0}', parameters('environmentid')))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "laworkspacerid": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', format('log-dbqs-{0}', parameters('environmentid')))]"
+            },
+            "laworkspacename": {
+              "type": "string",
+              "value": "[format('log-dbqs-{0}', parameters('environmentid'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, format('rg-dbqs-{0}', parameters('env'))), 'Microsoft.Resources/deployments', format('umi-dbqs-{0}', parameters('env')))]",
+        "[subscriptionResourceId('Microsoft.Resources/deployments', format('rg-dbqs-{0}', parameters('env')))]"
+      ]
+    }
+  ]
+}

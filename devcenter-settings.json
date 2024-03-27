@@ -1,0 +1,28 @@
+{
+    "definitions": [
+        {
+            "name": "win11-vs2022-vscode",
+            "image": "win11-ent-vs2022",
+            "compute": "8c-32gb",
+            "storage": "256gb"
+        },
+        {
+            "name": "win10-vs2022-vscode",
+            "image": "win10-ent-vs2022",
+            "compute": "8c-32gb",
+            "storage": "256gb"
+        }
+    ],
+    "pools": [
+        {
+            "name": "win11-vs2022-vscode-pool",
+            "definition": "win11-vs2022-vscode",
+            "administrator": "Enabled"
+        },
+        {
+            "name": "win10-vs2022-vscode-pool",
+            "definition": "win10-vs2022-vscode",
+            "administrator": "Enabled"
+        }
+    ]
+}
