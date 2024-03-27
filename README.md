@@ -17,14 +17,16 @@ Integration with Microsoft Intune: Dev Box management extends beyond the virtual
 Project-Based Configurations: Dev Box images can be tailored to match specific workflows. Whether it’s a web app, machine learning project, or game development, each dev box is customized.
 
 
-   ![Deploy](./images/overview.png)
+   ![Deploy](./overview.png)
 
 
 ## Overview
 
 This project deploys the following Azure resource types:
 
-- Azure Automation Account 
+- Dev Box Center
+- Dev Box Project
+- Dev Box Pools 
 - User Managed Identity
 
 ## Deployment
@@ -35,10 +37,10 @@ This project deploys the following Azure resource types:
 
 2. Specify your settings. 
 
-   <img src="./images/specify.png" alt="Specify"
+   <img src="./deployment.png" alt="Deployment"
 
 3. Login to your Microsoft Dev Box. 
 
-   <img src="./images/login.png" alt="Login"
+   <img src="./login.png" alt="Login"
 
 
