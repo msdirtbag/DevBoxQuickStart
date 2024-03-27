@@ -1,16 +1,20 @@
-# AzurePolicyAutomator
+# DevBoxQuickStart 1.0
 
-This project deploys a AzurePolicyAutomator and activates Azure Policy Remediation Tasks every (12) hours.
+This project makes w10/w11 Dev Boxes avaible to the selected Entra ID Security Group with a Azure Virtual Network that can be connected to most things. 
 
-## What is AzurePolicyAutomator?
+## What is Microsoft Dev Box?
 
-Azure Automation is a cloud-based service from Microsoft that allows developers and system administrators to automate the manual, long-running, error-prone, and frequently repeated tasks that are commonly performed in a cloud and enterprise environment. 
+Microsoft Dev Box is an Azure service designed to enhance developer productivity by providing self-service access to cloud-based workstations—referred to as dev boxes. These dev boxes are meticulously preconfigured, project-specific environments that allow developers to dive straight into coding without the hassle of manual setup or configuration. 
 
-Azure Policy Deploy-If-Not-Exists (DINE) is a policy effect in Azure Policy that provides a way to ensure your Azure environment is in compliance with specific rules. The DINE effect is used to automatically deploy resources if they do not already exist, based on the policy definition. This is particularly useful for enforcing certain configurations in your Azure environment. For example, you can create a DINE policy to automatically deploy a specific type of resource, like a Network Watcher in a region, if it doesn't already exist. This helps to ensure that your Azure environment is always in compliance with your organization's standards and best practices. In addition to deploying resources, DINE policies can also be used to execute scripts or functions, providing a flexible way to enforce compliance and manage your Azure environment.
+Self-Service Access: Developers can access Microsoft Dev Box on demand, creating a seamless experience for setting up their development environment. Gone are the days of waiting for IT teams to provision workstations; with Dev Box, developers take control of their own setup.
 
-Azure Policy Remediation Tasks are automated processes that help bring resources back into compliance with the assigned policies. When a policy or initiative is assigned that includes the DeployIfNotExists or Modify effect, and non-compliant resources are found, a remediation task is triggered. Remediation tasks can be created automatically during policy assignment or manually after the policy assignment. They apply the changes required to make the non-compliant resources compliant with the policy. For example, if a policy requires that all virtual machines have a specific extension installed, a remediation task will automatically install the extension on any existing or newly created virtual machines that don't have it.
+Preconfigured Developer Boxes: Dev boxes come preloaded with essential tools, libraries, and dependencies specific to the project.
 
-DINE Azure Policies only once automatically and trys to enforce that state. AzurePolicyAutomator makes this a continuous process so Azure policy is always running & returning the environment to desired state. 
+Avoid Configuration Conflicts: Working across multiple dev boxes is a breeze. Developers can switch between different project contexts without worrying about conflicting configurations.
+
+Integration with Microsoft Intune: Dev Box management extends beyond the virtual realm. Dev Boxes are automatically managed with Microsoft Intune.
+
+Project-Based Configurations: Dev Box images can be tailored to match specific workflows. Whether it’s a web app, machine learning project, or game development, each dev box is customized.
 
 
    ![Deploy](./images/overview.png)
@@ -29,16 +33,12 @@ This project deploys the following Azure resource types:
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fmsdirtbag%2FAzurePolicyAutomator%2Fmain%2Fmain.json)
 
-2. Specify the Azure Subscription.
+2. Specify your settings. 
 
-   <img src="./images/sub.png" alt="Sub" width="600" height="600">
+   <img src="./images/specify.png" alt="Specify"
 
-3. Review the deployed componets and wait for the 1st Job to start in the next 60 minutes. 
+3. Login to your Microsoft Dev Box. 
 
-   <img src="./images/deployed.png" alt="Deployed" width="600" height="600">
+   <img src="./images/login.png" alt="Login"
 
-   <img src="./images/rg.png" alt="Rg" width="600" height="600">
 
-   <img src="./images/job.png" alt="Job" width="600" height="600">
-
-   <img src="./images/tasks.png" alt="Tasks" width="600" height="600">
