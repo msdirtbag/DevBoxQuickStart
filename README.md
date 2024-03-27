@@ -40,11 +40,17 @@ This project deploys the following Azure resource types:
    Example:
 
    location = 'eastus2'
+
    vnetspace = '192.168.0.0/22'
+
    mainsnetspace = '192.168.0.0/22'
+
    stoptime = '19:00'
+
    stoptimezone = 'America/Chicago'
+
    dbusergroupid = 'the entra id client id of the security group for Dev Box'
+   
    dblocaladmin = 'Enabled'
 
 3. Login to your Microsoft Dev Box. 
