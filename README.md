@@ -37,10 +37,10 @@ This project deploys the following Azure resource types:
 
 2. Specify your settings. 
 
-   <img src="./deployment.png" alt="Deployment"
+   <img src="deployment.png" alt="Deployment"
 
 3. Login to your Microsoft Dev Box. 
 
-   <img src="./login.png" alt="Login"
+   <img src="login.png" alt="Login"
 
 
